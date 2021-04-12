@@ -6,6 +6,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Dataset, random_split
 import torch.nn.functional as F
 from torch.autograd import Variable
+from dice_loss import DiceLoss
 import shutil
 from data_loader import ImgDataSet
 import os
@@ -87,7 +88,7 @@ def train(train_loader, model, criterion, optimizer, validation, args):
     best_model_path = os.path.join(*[args.model_dir, 'model_best.pt'])
 
     if latest_model_path is not None:
-        state = torch.load(latest_model_path, map_location=torch.device('cpu'))
+        state = torch.load(latest_model_path)
         epoch = state['epoch']
         model.load_state_dict(state['model'])
         epoch = epoch
@@ -118,8 +119,8 @@ def train(train_loader, model, criterion, optimizer, validation, args):
 
         model.train()
         for i, (input, target) in enumerate(train_loader):
-            input_var = Variable(input)
-            target_var = Variable(target)
+            input_var = Variable(input).cuda()
+            target_var = Variable(target).cuda()
 
             masks_pred = model(input_var)
 
@@ -237,6 +238,7 @@ if __name__ == '__main__':
     # crack_weight = 0.4*calc_crack_pixel_weight(DIR_MASK)
     # print(f'positive weight: {crack_weight}')
     # criterion = nn.BCEWithLogitsLoss(pos_weight=torch.Tensor([crack_weight]).to('cuda'))
+    # criterion = DiceLoss().to('cuda')
     criterion = nn.BCEWithLogitsLoss().to('cuda')
 
     channel_means = [0.485, 0.456, 0.406]
@@ -255,9 +257,11 @@ if __name__ == '__main__':
     valid_size = len(dataset) - train_size
     train_dataset, valid_dataset = random_split(dataset, [train_size, valid_size])
 
-    train_loader = DataLoader(train_dataset, args.batch_size, shuffle=False, pin_memory=False,
+    train_loader = DataLoader(train_dataset, args.batch_size, shuffle=False, pin_memory=torch.cuda.is_available(),
                               num_workers=args.num_workers)
-    valid_loader = DataLoader(valid_dataset, args.batch_size, shuffle=False, pin_memory=False,
+    valid_loader = DataLoader(valid_dataset, args.batch_size, shuffle=False, pin_memory=torch.cuda.is_available(),
                               num_workers=args.num_workers)
+
+    model.cuda()
 
     train(train_loader, model, criterion, optimizer, validate, args)

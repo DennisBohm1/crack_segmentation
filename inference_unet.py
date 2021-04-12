@@ -21,7 +21,7 @@ def evaluate_img(model, img):
 
     img_1 = cv.resize(img, (input_width, input_height), cv.INTER_AREA)
     X = train_tfms(Image.fromarray(img_1))
-    X = Variable(X.unsqueeze(0))  # [N, 1, H, W]
+    X = Variable(X.unsqueeze(0)).cuda()  # [N, 1, H, W]
 
     mask = model(X)
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
         model = load_unet_resnet_101(args.model_path)
     elif args.model_type  == 'resnet34':
         model = load_unet_resnet_34(args.model_path)
-        print(model)
+        # print(model)
     else:
         print('undefind model name pattern')
         exit()

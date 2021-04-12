@@ -54,9 +54,10 @@ The splitting is stratified so that the proportion of each dataset in the train 
 # Dependencies
 ```python
 conda create --name crack
-conda install -c anaconda pytorch-gpu 
-conda install -c conda-forge opencv 
-conda install matplotlib scipy numpy tqdm pillow
+conda install -c anaconda pytorch-gpu && \
+conda install -c conda-forge opencv && \
+conda install matplotlib scipy numpy tqdm pillow && \
+conda install numba
 ```
 
 ***
@@ -67,6 +68,8 @@ conda install matplotlib scipy numpy tqdm pillow
 - run the code
 ```pythonstub
 python inference_unet.py  -img_dir ./test_imgs -model_path ./models/model_unet_vgg_16_best.pt -model_type vgg16 -out_pred_dir ./test_results
+python inference_unet.py  -img_dir ./cfd/test/images -model_path ./models/CFD/model_best.pt -model_type resnet34 -out_pred_dir ./test_results/CFD
+python inference_unet.py  -img_dir ./CRACK500/test/images -model_path ./models/CRACK500/model_best.pt -model_type resnet34 -out_pred_dir ./test_results/CRACK500
 # python inference_unet.py  -in_dir ./test_images -model_path ./models/model_unet_resnet_101_best.pt -out_dir ./test_result
 ```
 
@@ -99,6 +102,8 @@ I am very welcome to further idea from you. please drop me an email at khanhhh89
 - step 3: 
 ```python 
 python train_unet.py -data_dir ./crack_segmentation_dataset -model_dir ./models -model_type resnet34
+python train_unet.py -data_dir ./cfd/train -model_dir ./models/CFD -model_type resnet34
+python train_unet.py -data_dir ./CRACK500/train -model_dir ./models/CRACK500 -model_type resnet34
 ```
 
 # Result
@@ -111,6 +116,12 @@ The best result is achieved by UNet_Resnet_101 with IoU = and Dice =
 | DenseNet         |       |        |
 
 ***
+
+# Evaluate
+```python
+python evaluate_unet.py -ground_truth_dir ./cfd/test/masks -pred_dir ./test_results/CFD/
+python evaluate_unet.py -ground_truth_dir ./CRACK500/test/masks -pred_dir ./test_results/CRACK500/
+```
 
 # Citation
 Note: please cite the corresponding papers when using these datasets.

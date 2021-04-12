@@ -1,7 +1,9 @@
-models/*
+models/*.pt
 .idea/*
-*pycache*
+__pycache*
+unet/__pycache*
 venv*
 test_imgs/*
 test_results/*
 crack_segmentation_dataset/*
+crack_segmentation_set.zip
