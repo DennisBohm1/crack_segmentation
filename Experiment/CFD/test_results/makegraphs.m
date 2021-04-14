@@ -27,9 +27,11 @@ for n = 1 : length(dinfo)
         lrIDX = 8;
     end
     
-    iteration = erase(fileName, ["Crack", ".log"]);
+    iteration = erase(fileName, ["CFD", ".log"]);
     index = find(isletter(iteration), 1);
     iteration(1:index-1) = [];
+    
+    fprintf(iteration);
     
     if strcmp(iteration, 'First')
         iterIDX = 1;
